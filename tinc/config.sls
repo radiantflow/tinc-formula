@@ -17,23 +17,23 @@
     - user: root
     - group: root
 
-  {% for hostname, host in network.items() %}
+{% for hostname, host in network.items() %}
 
 /etc/tinc/{{ netname }}/hosts/{{ hostname }}:
   file.managed:
     - mode: 755
     - user: root
     - group: root
-    - makedirs: true
+    - clean: true
     - source: salt://tinc/template/host.tmpl
     - template: 'jinja'
     - context:
       host_config: {{ host.get('host_config', {})|json }}
       RSAPublicKey: {{ host.get('RSAPublicKey')|json }}
 
-    {%- set short_name = grains['id'].split('.') | first %}
+{%- set short_name = grains['id'].split('.') | first %}
 
-    {%- if short_name == hostname %}
+{%- if short_name == hostname %}
 /etc/tinc/{{ netname }}/tinc.conf:
   file.managed:
     - mode: 755
@@ -48,25 +48,25 @@
     - watch_in:
       - service: tinc
 
-      {%- if host.get('tinc_up', {}) is defined %}
+{%- if host.get('tinc_up', {}) is defined %}
 /etc/tinc/{{ netname }}/tinc-up:
   file.managed:
     - mode: 755
     - user: root
     - group: root
     - contents_pillar: tinc:{{ netname }}:{{ hostname }}:tinc_up
-      {%- endif %}
+{%- endif %}
 
-      {%- if host.get('tinc_down', {}) is defined %}
+{%- if host.get('tinc_down', {}) is defined %}
 /etc/tinc/{{ netname }}/tinc-down:
   file.managed:
     - mode: 755
     - user: root
     - group: root
     - contents_pillar: tinc:{{ netname }}:{{ hostname }}:tinc_down
-      {%- endif %}
+{%- endif %}
 
-      {%- if host.get('RSAPrivateKey', {}) is defined %}
+{%- if host.get('RSAPrivateKey', {}) is defined %}
 /etc/tinc/{{ netname }}/rsa_key.priv:
   file.managed:
     - mode: 700
@@ -75,6 +75,6 @@
     - contents_pillar: tinc:{{ netname }}:{{ hostname }}:RSAPrivateKey
       {%- endif %}
 
-    {% endif %}
-  {% endfor %}
+{% endif %}
+{% endfor %}
 {% endfor %}
