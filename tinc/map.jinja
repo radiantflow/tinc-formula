@@ -1,0 +1,3 @@
+{% import_yaml slspath+"/defaults.yaml" as defaults %}
+
+{% set tinc = salt['pillar.get']('tinc', default=defaults.tinc, merge=True) %}
