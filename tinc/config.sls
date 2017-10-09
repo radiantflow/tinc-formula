@@ -1,26 +1,77 @@
-/etc/tinc/nets.boot:
+{% from slspath+"/map.jinja" import tinc with context %}
+{%- set host = grains['id'].split('.') | first %}
+
+tinc-net-boot:
   file.managed:
-    - mode: 755
-    - user: root
-    - group: root
-    - makedirs: true
-    - replace: false
-    - template: 'jinja'
+    - name: /etc/tinc/nets.boot
     - source: salt://tinc/files/nets.boot
+    - mode: 755
+    - template: jinja
+    - user: root
+    - group: root
+    - makedirs: true
 
-{% for netname, network in pillar.get('tinc:networks', {}).items() %}
+{% for netname, network in tinc.get('networks', {}).items() %}
 
-/etc/tinc/{{ netname }}/hosts/:
+tinc-hosts-directory-{{netname}}:
   file.directory:
+    - name: /etc/tinc/{{ netname }}/hosts/
     - makedirs: true
     - mode: 755
     - user: root
     - group: root
 
-{% for hostname, host in network.items() %}
-
-/etc/tinc/{{ netname }}/hosts/{{ hostname }}:
+tinc-config-{{netname}}:
   file.managed:
+    - name: /etc/tinc/{{ netname }}/tinc.conf
+    - mode: 755
+    - user: root
+    - group: root
+    - clean: true
+    - source: salt://tinc/template/tinc.conf.tmpl
+    - template: 'jinja'
+    - context:
+        config: {{ network.get('config', {})|json }}
+        hostname: {{ host|json }}
+    - watch_in:
+      - service: tinc
+
+{%- if network.tinc_up is defined %}
+tinc-up-network-{{ netname }}:
+  file.managed:
+    - name: /etc/tinc/{{ netname }}/tinc-up
+    - mode: 755
+    - user: root
+    - group: root
+    - contents_pillar: tinc:networks:{{ netname }}:tinc_up
+{%- endif %}
+
+{%- if network.tinc_down is defined %}
+tinc-down-network-{{ netname }}:
+  file.managed:
+    - name: /etc/tinc/{{ netname }}/tinc-down
+    - mode: 755
+    - user: root
+    - group: root
+    - contents_pillar: tinc:networks:{{ netname }}:tinc_down
+{%- endif %}
+
+{%- if network.private_key is defined %}
+tinc-private-key-{{ netname }}:
+  file.managed:
+    - name: /etc/tinc/{{ netname }}/rsa_key.priv
+    - mode: 700
+    - user: root
+    - group: root
+    - contents: tinc:networks:{{ netname }}:private_key
+{%- endif %}
+
+
+{% for hostname, host in network['nodes'].items() %}
+
+tinc-host-file-{{ netname }}-{{ hostname}}:
+  file.managed:
+    - name: /etc/tinc/{{ netname }}/hosts/{{ hostname}}
     - mode: 755
     - user: root
     - group: root
@@ -28,53 +79,9 @@
     - source: salt://tinc/template/host.tmpl
     - template: 'jinja'
     - context:
-      host_config: {{ host.get('host_config', {})|json }}
-      RSAPublicKey: {{ host.get('RSAPublicKey')|json }}
+        config: {{ host.get('config', {})|json }}
+        public_key: {{ host.get('public_key', "")|json }}
 
-{%- set short_name = grains['id'].split('.') | first %}
-
-{%- if short_name == hostname %}
-/etc/tinc/{{ netname }}/tinc.conf:
-  file.managed:
-    - mode: 755
-    - user: root
-    - group: root
-    - makedirs: true
-    - source: salt://tinc/template/tinc.conf.tmpl
-    - template: 'jinja'
-    - context:
-      tinc_config: {{ host.get('tinc_config')|json }}
-      hostname: {{ hostname|json }}
-    - watch_in:
-      - service: tinc
-
-{%- if host.get('tinc_up', {}) is defined %}
-/etc/tinc/{{ netname }}/tinc-up:
-  file.managed:
-    - mode: 755
-    - user: root
-    - group: root
-    - contents_pillar: tinc:{{ netname }}:{{ hostname }}:tinc_up
-{%- endif %}
-
-{%- if host.get('tinc_down', {}) is defined %}
-/etc/tinc/{{ netname }}/tinc-down:
-  file.managed:
-    - mode: 755
-    - user: root
-    - group: root
-    - contents_pillar: tinc:{{ netname }}:{{ hostname }}:tinc_down
-{%- endif %}
-
-{%- if host.get('RSAPrivateKey', {}) is defined %}
-/etc/tinc/{{ netname }}/rsa_key.priv:
-  file.managed:
-    - mode: 700
-    - user: root
-    - group: root
-    - contents_pillar: tinc:{{ netname }}:{{ hostname }}:RSAPrivateKey
-      {%- endif %}
-
-{% endif %}
 {% endfor %}
+
 {% endfor %}
