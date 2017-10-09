@@ -23,6 +23,7 @@ tinc:
     - group: root
     - makedirs: true
     - replace: false
+    - template: 'jinja'
     - source: salt://tinc/files/nets.boot
 
 {% for netname, network in pillar.get('tinc', {}).items() %}
