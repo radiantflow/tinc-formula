@@ -21,6 +21,7 @@ tinc:
     - mode: 755
     - user: root
     - group: root
+    - makedirs: true
     - replace: false
     - source: salt://tinc/files/nets.boot
 
@@ -40,6 +41,7 @@ tinc:
     - mode: 755
     - user: root
     - group: root
+    - makedirs: true
     - source: salt://tinc/template/host.tmpl
     - template: 'jinja'
     - context:
@@ -54,6 +56,7 @@ tinc:
     - mode: 755
     - user: root
     - group: root
+    - makedirs: true
     - source: salt://tinc/template/tinc.conf.tmpl
     - template: 'jinja'
     - context:
