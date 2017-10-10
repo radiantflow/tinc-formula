@@ -63,7 +63,7 @@ tinc-private-key-{{ netname }}:
     - mode: 700
     - user: root
     - group: root
-    - contents: tinc:networks:{{ netname }}:private_key
+    - contents_pillar: tinc:networks:{{ netname }}:private_key
 {%- endif %}
 
 
