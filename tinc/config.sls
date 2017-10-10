@@ -1,4 +1,4 @@
-{% from slspath+"/map.jinja" import tinc with context %}
+{% from slspath+"/map.jinja" import tinc, tinc_external_ips with context %}
 {%- set host = grains['id'].split('.') | first %}
 
 tinc-net-boot:
@@ -79,6 +79,7 @@ tinc-host-file-{{ netname }}-{{ hostname}}:
     - source: salt://tinc/template/host.tmpl
     - template: 'jinja'
     - context:
+        address: {{ host.get('ip', "")|json }}
         config: {{ host.get('config', {})|json }}
         public_key: {{ host.get('public_key', "")|json }}
 

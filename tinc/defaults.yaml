@@ -1,2 +1,22 @@
 tinc:
   networks: {}
+
+  defaults:
+    network:
+      type: central
+      config:
+        local: {}
+        host: {}
+      scripts:
+        local: {}
+        host: {}
+      node: {}
+    node:
+      ip: ""
+      config:
+        local: {}
+        host: {}
+      scripts:
+        local: {}
+        host: {}
+      master: False

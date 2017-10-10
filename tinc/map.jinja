@@ -1,3 +1,25 @@
 {% import_yaml slspath+"/defaults.yaml" as defaults %}
 
-{% set tinc = salt['pillar.get']('tinc', default=defaults.tinc, merge=True) %}
+{% set tinc_pillar = salt['pillar.get']('tinc', default=defaults.tinc, merge=True) %}
+
+{# Get Mine Data #}
+{% set tinc_external_ips = salt['mine.get']('role:tinc', 'external_ip', expr_form = 'grain') %}
+
+{# Add Network Defaults #}
+{% for network, network_settings in tinc_pillar['networks'].items() %}
+  {% set merged_network=salt['pillar.get']('tinc:networks:' ~ network, tinc_pillar.defaults.network, merge=True) %}
+  {% do tinc_pillar['networks'][network].update(merged_network) %}
+  {% if network_settings['nodes'] %}
+    {% for node, node_setting in network_settings['nodes'].items() %}
+      {% set merged_node = salt['pillar.get']('tinc:networks:' ~ network ~ ':nodes:' ~ node, tinc_pillar.defaults.node, merge=True) %}
+      {% if node in tinc_external_ips and merged_node.get("ip", "") == "" %}
+        {% do merged_node.update({'ip': tinc_external_ips[node]}) %}
+      {% endif %}
+      {% do tinc_pillar['networks'][network]['nodes'][node].update(merged_node) %}
+    {% endfor %}
+  {% endif %}
+{% endfor %}
+
+{# Create import pillar #}
+{% set tinc = tinc_pillar %}
+
