@@ -1,5 +1,6 @@
 {% from slspath+"/map.jinja" import tinc with context %}
 
+
 tinc:
   pkg:
     - installed
@@ -18,6 +19,11 @@ tinc-init-redhat:
     - user: root
     - group: root
 {% endif %}
+
+tinc-tun:
+  kmod.present:
+    - name: tun
+    - persist: true
 
 # Create tinc user
 tinc-user:
