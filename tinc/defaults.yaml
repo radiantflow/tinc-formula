@@ -4,6 +4,7 @@ tinc:
   defaults:
     network:
       type: central
+      connect_to: []
       config:
         local: {}
         host: {}

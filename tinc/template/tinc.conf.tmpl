@@ -13,8 +13,9 @@ Name = {{ config.get('Name', hostname) }}
 # Comment these out to make yourself a listen-only connection
 # You must use the name of another tinc host.
 # May be used multiple times for redundance.
-#ConnectTo = beta
-
+{%- for host in connect_to | unique %}
+ConnectTo = {{ host }}
+{% endfor %}
 # The tap device tinc will use.
 # Default is /dev/tap0 for ethertap or FreeBSD,
 # /dev/tun0 for Solaris and OpenBSD,

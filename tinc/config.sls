@@ -1,5 +1,14 @@
 {% from slspath+"/map.jinja" import tinc, tinc_external_ips with context %}
-{%- set host = grains['id'].split('.') | first %}
+{%- set current_host = grains['id'].split('.') | first %}
+
+tinc-debug:
+  file.managed:
+    - name: /etc/tinc/debug
+    - contents: "{{ tinc.networks.default | yaml(False) }}"
+    - mode: 755
+    - clean: true
+    - user: root
+    - group: root
 
 tinc-net-boot:
   file.managed:
@@ -31,8 +40,9 @@ tinc-config-{{netname}}:
     - source: salt://tinc/template/tinc.conf.tmpl
     - template: 'jinja'
     - context:
+        connect_to: {{ network.get('connect_to', {}) | json}}
         config: {{ network.get('config', {})|json }}
-        hostname: {{ host|json }}
+        hostname: {{ current_host|json }}
     - watch_in:
       - service: tinc
 
@@ -82,6 +92,7 @@ tinc-host-file-{{ netname }}-{{ hostname}}:
         address: {{ host.get('ip', "")|json }}
         config: {{ host.get('config', {})|json }}
         public_key: {{ host.get('public_key', "")|json }}
+
 
 {% endfor %}
 
