@@ -90,6 +90,7 @@ tinc-host-file-{{ netname }}-{{ hostname}}:
     - template: 'jinja'
     - context:
         address: {{ host.get('ip', "")|json }}
+        subnets: {{ host.get('subnets', {})|json }}
         config: {{ host.get('config', {})|json }}
         public_key: {{ host.get('public_key', "")|json }}
 
