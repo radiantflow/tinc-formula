@@ -1,7 +1,7 @@
 Name = {{ config.get('Name', hostname) }}
 {%- for host in connect_to | unique %}
 ConnectTo = {{ host }}
-{% endfor %}
+{%- endfor %}
 
 {%- for keyword, argument in config.items() %}
         {%- if argument is none %}
