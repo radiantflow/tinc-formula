@@ -6,18 +6,10 @@ tinc:
       type: central
       connect_to: []
       config:
-        local: {}
-        host: {}
-      scripts:
-        local: {}
-        host: {}
-      node: {}
+        Port: 655
+      scripts: {}
+      nodes: {}
     node:
       ip: ""
-      config:
-        local: {}
-        host: {}
-      scripts:
-        local: {}
-        host: {}
-      master: False
+      config: {}
+      scripts: {}
