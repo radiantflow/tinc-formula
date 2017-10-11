@@ -16,8 +16,15 @@
         {% do merged_node.update({'ip': tinc_external_ips[node]}) %}
       {% endif %}
       {% do tinc_pillar['networks'][network]['nodes'][node].update(merged_node) %}
-      {% if grains['id'] != node and not node in tinc_pillar['networks'][network]['connect_to'] %}
-        {% do tinc_pillar['networks'][network]['connect_to'].append(node) %}
+      {% if grains['id'] != node %}
+        {% if not node in tinc_pillar['networks'][network]['connect_to'] %}
+          {% do tinc_pillar['networks'][network]['connect_to'].append(node) %}
+        {% endif %}
+        {% for subnet in merged_node.subnets %}
+          {% if not subnet in tinc_pillar['networks'][network]['remote_subnets'] %}
+            {% do tinc_pillar['networks'][network]['remote_subnets'].append(subnet) %}
+          {% endif %}
+        {% endfor %}
       {% endif %}
     {% endfor %}
   {% endif %}

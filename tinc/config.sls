@@ -46,25 +46,37 @@ tinc-config-{{netname}}:
     - watch_in:
       - service: tinc
 
-{%- if network.tinc_up is defined %}
 tinc-up-network-{{ netname }}:
   file.managed:
     - name: /etc/tinc/{{ netname }}/tinc-up
     - mode: 755
     - user: root
     - group: root
-    - contents_pillar: tinc:networks:{{ netname }}:tinc_up
-{%- endif %}
+    - source: salt://tinc/files/tinc-up.jinja
+    - template: 'jinja'
+    - context:
+        config: {{ network.get('config', {})|json }}
+        hostname: {{ current_host|json }}
+        tinc_subnet: {{ network.get('tinc_subnet', "")|json }}
+        tinc_mask: {{ network.get('tinc_mask', "")|json }}
+        tinc_ip: {{ network['nodes'][current_host].get('tinc_ip', "")|json }}
+        remote_subnets: {{ network.get('remote_subnets', {})|json }}
 
-{%- if network.tinc_down is defined %}
 tinc-down-network-{{ netname }}:
   file.managed:
     - name: /etc/tinc/{{ netname }}/tinc-down
     - mode: 755
     - user: root
     - group: root
-    - contents_pillar: tinc:networks:{{ netname }}:tinc_down
-{%- endif %}
+    - source: salt://tinc/files/tinc-down.jinja
+    - template: 'jinja'
+    - context:
+        config: {{ network.get('config', {})|json }}
+        hostname: {{ current_host|json }}
+        tinc_subnet: {{ network.get('tinc_subnet', "")|json }}
+        tinc_mask: {{ network.get('tinc_mask', "")|json }}
+        tinc_ip: {{ network['nodes'][current_host].get('tinc_ip', "")|json }}
+        remote_subnets: {{ network.get('remote_subnets', {})|json }}
 
 {%- if network.private_key is defined %}
 tinc-private-key-{{ netname }}:
@@ -91,6 +103,7 @@ tinc-host-file-{{ netname }}-{{ hostname}}:
     - context:
         address: {{ host.get('ip', "")|json }}
         subnets: {{ host.get('subnets', {})|json }}
+        tinc_ip: {{ host.get('tinc_ip', "")|json }}
         config: {{ host.get('config', {})|json }}
         public_key: {{ host.get('public_key', "")|json }}
 

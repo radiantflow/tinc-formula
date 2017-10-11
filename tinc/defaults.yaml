@@ -3,8 +3,8 @@ tinc:
 
   defaults:
     network:
-      type: central
       connect_to: []
+      remote_subnets: []
       config:
         Port: 655
       scripts: {}

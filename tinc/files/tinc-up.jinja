@@ -1,0 +1,11 @@
+#!/bin/bash
+
+ip link set dev $INTERFACE up
+
+ip addr add {{ tinc_ip }}/{{ tinc_mask }} dev $INTERFACE
+
+{%- for subnet in remote_subnets | unique %}
+ip route add {{ subnet }} dev $INTERFACE
+{%- endfor %}
+
+

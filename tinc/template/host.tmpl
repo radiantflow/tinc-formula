@@ -1,4 +1,7 @@
 Address = {{ address }}
+{%- if tinc_ip is defined %}
+Subnet = {{ tinc_ip }}
+{%- endif %}
 {%- for range in subnets | unique %}
 Subnet = {{ range }}
 {%- endfor %}
