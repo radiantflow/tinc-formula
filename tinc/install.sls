@@ -20,10 +20,11 @@ tinc-init-redhat:
     - group: root
 {% endif %}
 
-tinc-tun:
-  kmod.present:
-    - name: tun
-    - persist: true
+# Disabled until it supports built in modules
+#tinc-tun:
+#  kmod.present:
+#    - name: tun
+#    - persist: true
 
 # Create tinc user
 tinc-user:
