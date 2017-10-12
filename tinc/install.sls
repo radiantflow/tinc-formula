@@ -5,10 +5,6 @@ tinc:
   pkg:
     - installed
     - name: tinc
-  service:
-    - running
-    - name: tinc
-    - enable: True
 
 {% if grains['os_family'] == 'RedHat' %}
 tinc-init-redhat:
