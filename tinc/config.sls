@@ -101,7 +101,7 @@ tinc-host-file-{{ netname }}-{{ hostname}}:
     - source: salt://tinc/template/host.tmpl
     - template: 'jinja'
     - context:
-        address: {{ host.get('ip', "")|json }}
+        address: {{ host.get('address', host.get('ip', ""))|json }}
         subnets: {{ host.get('subnets', {})|json }}
         tinc_ip: {{ host.get('tinc_ip', "")|json }}
         config: {{ host.get('config', {})|json }}
