@@ -3,7 +3,7 @@
 {% set tinc_pillar = salt['pillar.get']('tinc', default=defaults.tinc, merge=True) %}
 
 {# Get Mine Data #}
-{% set tinc_external_ips = salt['mine.get']('role:tinc', 'external_ip', expr_form = 'grain') %}
+{% set tinc_external_ips = salt['mine.get']('features:tinc', 'external_ip', expr_form = 'grain') %}
 
 {# Add Network Defaults #}
 {% for network, network_settings in tinc_pillar['networks'].items() %}
