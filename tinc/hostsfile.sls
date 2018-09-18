@@ -1,12 +1,14 @@
+{% from slspath+"/map.jinja" import tinc, tinc_external_ips with context %}
+
 include:
   - tinc
 
-{% for netname, network in pillar.get('tinc', {}).items() %}
-  {% for hostname, host in network.items() %}
+{% for netname, network in tinc.get('networks', {}).items() %}
+  {% for hostname, host in network['nodes'].items() %}
 
 {{ hostname }}-host-entry:
   host.present:
-    - ip: {{ host['host_config']['Subnet'].split('/') | first }}
+    - ip: {{ host.get('tinc_ip', "")|json }}
     - names:
       - {{ hostname + "." + netname }}
 
